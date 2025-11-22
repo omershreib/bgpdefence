@@ -31,6 +31,16 @@ def asn_path_graphic_analysis(G, as_relationships):
             continue
 
         # case of valid C2P route:
+        # w --> (C2P) --> u --> (P2P) --> v
+        if u in as_relationships[w]['providers'] and v in as_relationships[u]['other_peers']:
+            edge_colors.append('green')
+            edge_styles.append('solid')
+            edge_labels[(w, u)] = 'C2P'
+            w = u
+            prev_v = v
+            continue
+
+        # case of valid C2P route:
         # w --> (C2P) --> u --> (C2P) --> v
         if u in as_relationships[w]['providers'] and v in as_relationships[u]['providers']:
             edge_colors.append('green')
@@ -51,12 +61,33 @@ def asn_path_graphic_analysis(G, as_relationships):
             prev_v = v
             continue
 
-        # case of valid C2P-->P2C route:
+        # case of valid P2C route:
+        # w --> (P2C) --> u --> (P2P) --> v
+        if u in as_relationships[w]['customers'] and v in as_relationships[u]['other_peers']:
+            edge_colors.append('green')
+            edge_styles.append('solid')
+            edge_labels[(w, u)] = 'P2C'
+
+            w = u
+            prev_v = v
+            continue
+
+        # case of valid C2P --> P2C route:
         # w --> (C2P) --> u --> (P2C) --> v
         if w in as_relationships[u]['customers'] and v in as_relationships[u]['customers']:
             edge_colors.append('green')
             edge_styles.append('solid')
             edge_labels[(w, u)] = 'C2P'
+
+            w = u
+            prev_v = v
+            continue
+
+        # case of valid P2P route:
+        # w --> (P2P) --> u --> (P2P) --> v
+        if w in as_relationships[u]['other_peers'] and v in as_relationships[u]['other_peers']:
+            edge_colors.append('blue')
+            edge_styles.append('solid')
 
             w = u
             prev_v = v

@@ -1,6 +1,6 @@
 from pyparsing import Word, Combine, Optional, oneOf, nums, Group, OneOrMore, Literal, ParseException
 from ipaddress import IPv4Address, IPv4Network
-from parse_ip_route import ip_routes_to_net_masks_dict
+#from parse_ip_route import ip_routes_to_net_masks_dict
 import pandas as pd
 
 def load_bgp_table_file(filename):
@@ -21,8 +21,8 @@ def load_bgp_table_file(filename):
     return file_lines
 
 
-bgp_file = r"D:\Documents\open university\netSeminar\source\detection\system\sensor\bgp_table.txt"
-table = load_bgp_table_file(bgp_file)
+
+
 
 # Define grammar components
 status_code = Combine(Optional(oneOf("r * >")) + Optional(Literal(">")))
@@ -101,7 +101,8 @@ def normalize_network(net_str):
 
 
 
-def bgp_table_to_dict():
+def bgp_table_to_dict(bgp_file):
+    table = load_bgp_table_file(bgp_file)
     bgp_routes = []
     for row in table:
         results = []
@@ -154,8 +155,9 @@ def bgp_table_to_dict():
 
 if __name__ == '__main__':
 
-    bgp_routes = bgp_table_to_dict()
-    #masks = ip_routes_to_net_masks_dict()
+    bgp_file = r"D:\Documents\open university\netSeminar\source\detection\system\sensor\bgp_table.txt"
+    bgp_routes = bgp_table_to_dict(bgp_file)
+
     for route in bgp_routes:
         print(route)
 

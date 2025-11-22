@@ -9,7 +9,7 @@ from matplotlib.figure import Figure
 
 #plt.style.use('ggplot')
 #plt.style.use('fivethirtyeight')
-plt.style.use('dark_background')
+#plt.style.use('dark_background')
 
 def set_delay_scatter():
     fig = Figure()
@@ -22,11 +22,11 @@ def set_delay_scatter():
 
     return fig, ax
 
-def get_delay_chart(collection, limit = 3):
+def get_delay_chart(collection, limit = 50):
     delay_data = []
 
     mongo_filter = {
-        'sensor_id': 1
+        'sensor_id': 2
     }
     sort = list({'timestamp': -1}.items())
     mongo_delay_temp = collection.find(
@@ -39,15 +39,24 @@ def get_delay_chart(collection, limit = 3):
         pack = (item['timestamp'].strftime("%H:%M:%S"), get_data_plane_delay(item))
         delay_data.append(pack)
 
-    threshold = 6
+    threshold = 150
+    #plt.style.use('seaborn-v0_8-dark')
+    #plt.style.use('fivethirtyeight')
+    plt.style.use('dark_background')
+
     fig, ax = set_delay_scatter()
 
     times = [t for t, _ in delay_data]
     delays = [d for _, d in delay_data]
 
+    # label, value
+    #return times, delays
+
+    # matplotlib
     plt.scatter(times, delays, color=['blue' if delay < threshold else 'red' for delay in delays])
     plt.plot(times, delays, linestyle='--', color='red', label='Dashed Line')
     plt.xticks(rotation=45)
+    plt.title("Delay Timeline")
 
     # Save plot to PNG in memory
     output = io.BytesIO()

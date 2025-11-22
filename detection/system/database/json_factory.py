@@ -1,7 +1,8 @@
 from datetime import datetime
 
 
-sensors_dict = {'192.168.1.246': 1}
+sensors_dict = {'192.168.1.246': 1,
+                '192.0.0.3': 2}
 
 def jsonify_trace_list(sensor_ip, destination_ip, hops):
 
