@@ -2,7 +2,6 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="refresh" content="30">
 <!--    <title>{% block title %} Dashboard {% endblock %}</title>-->
   <title>Dashboard</title>
 
@@ -11,7 +10,7 @@
 
 </head>
 <body style="background: #212529;">
-
+{{ turbo() }}
 <nav class="navbar" style="background: #212529;">
   <div class="container-fluid">
     <a class="navbar-brand" style="color: aliceblue;">
@@ -53,12 +52,20 @@
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script>
-<script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/3.0.4/socket.io.js" integrity="sha512-aMGMvNYu8Ue4G+fHa359jcPb1u+ytAF+P2SCb+PxrjCdO3n3ZTxJ30zuH39rimUggmTwmh2u7wvQsDTHESnmfQ==" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.1/chart.min.js"></script>
+
 
 {% block body %}
+
 <div class="container-fluid bg-dark text-center" style="max-width: 95%;">
   <div class="row align-items-center" style="background: #343a40">
-    <div class="col">{% include "traceroute.html" %}</div>
+    <div class="col">
+      <div class="d-grid gap-2 d-md-flex justify-content-md-end" style="margin-bottom: 2%;">
+        <button onclick="window.location.reload();" type="submit" class="btn btn-outline-light">refresh</button>
+      </div>
+      {% include "traceroute.html" %}</div>
     <div class="col">{% include "delay_chart.html" %}</div>
   </div>
 
@@ -74,7 +81,6 @@
 
 </body>
 
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
 <script>
   function performPost() {

@@ -26,12 +26,6 @@ def get_dplane_chart(trace_hops, prefixes, sensor_asn=100):
                 raw_as_path.append(asn)
 
 
-
-        #print(response)
-
-        #pprint(hop_to_asn_dict)
-        #print(raw_as_path)
-
     egdes = make_edges(raw_as_path)
 
     fig = get_aspath_chart_fig("Data Plane AS-Path",raw_as_path, egdes, AS_RELATIONSHIPS)

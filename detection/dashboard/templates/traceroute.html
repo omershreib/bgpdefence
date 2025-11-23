@@ -7,8 +7,8 @@
 
 <div class="container">
   <div class="d-grid gap-2 d-md-flex justify-content-md-end" style="margin-bottom: 2%;">
-      <a name="btn_previous" onclick="performPost()" class="btn btn-outline-light" style="margin-right: 1%;" type="submit" href="{{ url_for('dashboard', uuid=prev_id) }}">previous</a>
-      <a name="btn_next"  onclick="performPost()" class="btn btn-outline-light" type="submit" href="{{ url_for('dashboard', uuid=next_id) }}">next</a>
+      <a name="btn_previous" class="btn btn-outline-light" style="margin-right: 1%;" type="submit" href="{{ url_for('dashboard', uuid=prev_id) }}">previous</a>
+      <a name="btn_next" class="btn btn-outline-light" type="submit" href="{{ url_for('dashboard', uuid=next_id) }}">next</a>
   </div>
   <div class="table-responsive">
   <table id="data_plane" class="table table-dark table-striped table-hover table-bordered">

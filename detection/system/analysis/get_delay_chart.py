@@ -1,3 +1,5 @@
+import time
+
 from detection.system.analysis.get_data_plane_delay import get_data_plane_delay
 import io
 import base64
@@ -26,7 +28,26 @@ def set_delay_scatter():
 
     return fig, ax
 
-def get_delay_chart(collection, limit = 25):
+
+def get_current_delay(collection):
+    print("get current delay")
+    #limit = 25
+    mongo_filter = {
+        'sensor_id': 2
+    }
+    sort = list({'timestamp': -1}.items())
+    latest_traceroute = collection.find_one(
+        filter=mongo_filter,
+        sort=sort
+    )
+
+    latest_delay = get_data_plane_delay(latest_traceroute)
+    timestamp = latest_traceroute['timestamp'].strftime("%H:%M:%S")
+
+    return latest_delay, timestamp
+
+
+def get_delay_chart(collection, limit=25):
     delay_data = []
 
     mongo_filter = {
@@ -58,28 +79,33 @@ def get_delay_chart(collection, limit = 25):
     #times = [t for t, _ in delay_data]
     delays = [d for _, d in delay_data]
 
-    # label, value
-    #return times, delays
+    # # label, value
+    # return times, delays
 
     # matplotlib
     plt.scatter(times, delays, color=['blue' if delay < threshold else 'red' for delay in delays])
     plt.plot(times, delays, linestyle='--', color='red', label='Dashed Line')
-    #plt.xticks(rotation=45)
+    plt.xticks(rotation=45)
     plt.title(f"Delay Timeline (Last {limit} Probes)")
 
-    locator = mdates.MinuteLocator(interval=1)
-    formatter = mdates.DateFormatter('%H:%M:%S')
-    ax.xaxis.set_major_locator(locator)
-    ax.xaxis.set_major_formatter(formatter)
-    plt.xticks(rotation=45)
-
     plt.tight_layout()
-
-
     return fig
 
-    # plt.savefig('delay_chart.png', format='png')
-    # plt.close(fig)
-    # output.seek(0)
-    #
-    # return base64.b64encode(output.getbuffer()).decode("ascii")
+
+if __name__ == '__main__':
+    from pymongo import MongoClient
+
+    client = MongoClient("mongodb://localhost:27017/")
+    db = client["network_monitoring"]
+    collection = db['traceroutes']
+
+    fig = get_delay_chart(collection)
+
+    delay_chart_fig = get_delay_chart(collection)
+    filename = f"test_delay.png"
+
+    fig.tight_layout()
+    plt.savefig(filename, format="png", dpi=120)
+    plt.close(fig)
+    plt.clf()
+

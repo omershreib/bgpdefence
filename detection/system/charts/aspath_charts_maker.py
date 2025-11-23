@@ -84,13 +84,18 @@ def get_aspath_chart_fig(title, nodes, edges, as_relationships):
     nx.draw_networkx_labels(G, pos)
     for (u, v), color, style in zip(G.edges(), edge_colors, edge_styles):
         nx.draw_networkx_edges(G, pos, edgelist=[(u, v)], edge_color=color, style=style, arrows=True)
-    nx.draw_networkx_edge_labels(G, pos, edge_labels=edge_labels, font_color='black')
 
-    plt.axis('off')
-    plt.tight_layout()
-    plt.title(title)
+    try:
+        nx.draw_networkx_edge_labels(G, pos, edge_labels=edge_labels, font_color='black')
 
-    return fig
+        plt.axis('off')
+        plt.tight_layout()
+        plt.title(title)
+
+        return fig
+
+    except Exception:
+        return None
 
 
 if __name__ == '__main__':
