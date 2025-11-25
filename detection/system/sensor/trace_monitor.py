@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta
-from detection.detection_tools.traceroute import traceroute_host
-from detection.system.database.mongo_inserter import MongoInserter, trace_queue
+from detection.system.sensor.traceroute import traceroute_host
+from detection.system.database.mongo_inserter import trace_queue
 import threading
 import time
 

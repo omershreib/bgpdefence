@@ -41,17 +41,29 @@ def upload_to_ftp(only_latest=True):
     ftp_user = ftp_credentials['user']
     ftp_pass = ftp_credentials['password']
 
+    print("connecting to localISP...")
+
     ssh = paramiko.SSHClient()
     ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
     ssh.connect(router_ip, username=router_user, password=router_pass)
+
+    print("connected to localISP")
 
     stdin, stdout, stderr = ssh.exec_command("show ip bgp")
     output = stdout.read().decode()
     ssh.close()
 
+    print("close connection with localISP")
+
     bio = BytesIO(output.encode('utf-8'))
+
+    print("connecting to FTP server...")
+
     ftp = FTP(ftp_server_ip)
     ftp.login(user=ftp_user, passwd=ftp_pass)
+
+    print("connected to FTP server")
+
     current_datetime = strftime("%Y_%m_%d_%H_%M", gmtime())
 
     ftp_filename = ftp_credentials['filename']
@@ -62,6 +74,8 @@ def upload_to_ftp(only_latest=True):
 
     if not only_latest:
         ftp.storbinary(f"STOR {current_filename}", bio)
+
+    print("close connection with FTP server")
 
     ftp.quit()
 
@@ -75,7 +89,7 @@ def bgp_worker():
     while True:
         try:
             print("Uploading to FTP...")
-            upload_to_ftp()
+            upload_to_ftp(only_latest=False)
             print("Upload complete.")
         except Exception as e:
             print(f"Error: {e}")

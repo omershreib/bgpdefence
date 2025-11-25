@@ -1,11 +1,4 @@
-import time
-
-from detection.system.analysis.get_data_plane_delay import get_data_plane_delay
-import io
-import base64
-from _datetime import datetime
-import matplotlib.dates as mdates
-import pandas as pd
+from detection.system.charts.get_data_plane_delay import get_data_plane_delay
 import matplotlib
 
 matplotlib.use('Agg')

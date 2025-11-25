@@ -1,16 +1,14 @@
 from detection.dashboard.dashboard_tools.save_fig_png import save_fig_png
-from detection.system.sensor.bgp_route_ftp_pull import pull_bgp_table_from_ftp as ftp_pull
-from detection.system.analysis.get_control_plane_chart import get_control_plane_chart
-from detection.system.analysis.get_data_plane_chart import get_data_plane_chart
-from detection.system.analysis.get_delay_chart import get_delay_chart
+from detection.system.sensor.bgp_table_from_ftp import pull_bgp_table
+from detection.system.charts.get_control_plane_chart import get_control_plane_chart
+from detection.system.charts.get_data_plane_chart import get_data_plane_chart
+from detection.system.charts.get_delay_chart import get_delay_chart
 from bson.objectid import ObjectId
 import time
 
 
 def compute_state(collection, prefixes, traceroute_id: str):
     """Fetch latest state and generate charts for a given traceroute id."""
-    #collection = db["traceroutes"]
-
     curr_data_plane = collection.find_one({"sensor_id": 2, "_id": ObjectId(f"{traceroute_id}")})
     if not curr_data_plane:
         return None
@@ -33,25 +31,16 @@ def compute_state(collection, prefixes, traceroute_id: str):
     delay_chart_url = save_fig_png(delay_chart_fig, prefix="delay_chart")
 
     # update BGP table (provided by LocalISP)
-    ftp_pull('latest_bgp_table.txt')
+    pull_bgp_table('latest_bgp_table.txt')
 
-    # Control plane chart
+    # control plane chart
     control_plane_chart_fig, _ = get_control_plane_chart()
     control_plane_chart_url = save_fig_png(control_plane_chart_fig, prefix="control_plane_chart")
 
-    #if trace_hops:
+    # data plane chart
     data_plane_chart_fig, data_plane_hops_to_asn = get_data_plane_chart(trace_hops, prefixes)
-
-    #if data_plane_chart_fig:
     data_plane_chart_url = save_fig_png(data_plane_chart_fig, prefix="data_plane_chart")
 
-    # else:
-    #     data_plane_chart_url = None
-
-    # if not trace_hops:
-    #     data_plane_chart_url = None
-
-    # Annotate hops with ASN
     for hop in trace_hops:
         if hop["responded"]:
             hop_asn = data_plane_hops_to_asn.get(hop["hop_ip"])
@@ -73,4 +62,4 @@ def compute_state(collection, prefixes, traceroute_id: str):
 
 
 if __name__ == '__main__':
-    ftp_pull("latest_bgp_table.txt")
+    pull_bgp_table("latest_bgp_table.txt")

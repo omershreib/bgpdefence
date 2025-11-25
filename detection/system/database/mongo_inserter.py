@@ -1,7 +1,6 @@
-from detection.detection_tools.traceroute import get_traceroute_list
+from detection.system.sensor.traceroute import get_traceroute_list
 from detection.system.database.json_factory import jsonify_trace_list
-from pymongo import MongoClient, errors
-from pprint import pprint
+from pymongo import MongoClient
 from queue import Queue
 import threading
 import time
@@ -80,7 +79,7 @@ class MongoInserter(threading.Thread):
             trace_list = get_traceroute_list(data_plane)
 
             to_json_doc = jsonify_trace_list(sensor_ip, target_ip, trace_list)
-            pprint(to_json_doc)
+            ##pprint(to_json_doc)
 
             result = self.collection.insert_one(to_json_doc)
             print("inserted document ID:", result.inserted_id)

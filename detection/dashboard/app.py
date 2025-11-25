@@ -9,7 +9,6 @@ from bson.objectid import ObjectId
 from flask import request, Flask, render_template, Response
 from turbo_flask import Turbo
 from threading import Lock
-from datetime import datetime, timedelta
 from markupsafe import escape
 from bson.json_util import dumps
 import threading
@@ -35,11 +34,11 @@ CONFIG['static_dir'] = STATIC_DIR
 os.makedirs(STATIC_DIR, exist_ok=True)
 
 # prefix2as configs
-prefixes = pd.read_csv(CONFIG['detection_tools']['prefix2as'])
+prefixes = pd.read_csv(CONFIG['utilites']['prefix2as'])
 
 
 def start_updater_thread():
-    # Prevent double-start under Flask's debug reloader
+    # prevent double-start under Flask's debug reloader
     if not app.debug or os.environ.get("WERKZEUG_RUN_MAIN") == "true":
         t = threading.Thread(target=updater_loop.updater_loop, args=(app, turbo), daemon=True)
         t.start()
@@ -107,7 +106,7 @@ def dashboard():
 
     # Initial full page render
     return render_template(
-        "dashboard.html",
+        "base.html",
         data_plane=state["data_plane"],
         delay_chart_url=state["delay_chart_url"],
         control_plane_chart_url=state["control_plane_chart_url"],
@@ -126,32 +125,19 @@ def remember_uuid():
 
 
 def run_app(monitor_parameters):
-    # # run monitor
-    # monitored_ip = "198.18.1.13"
-    # sensor_ip = "192.0.0.3"
-    # start = datetime.now() + timedelta(seconds=5)  # start 5 seconds from now
-    # end = start + timedelta(hours=3)  # run for 3 hours
 
-    #
+    # start mongo inserter thread
     mongo_inserter = MongoInserter(**make_mongo_inserter_parameters(CONFIG['system']['mongoDB']))
-    #mongo_inserter.connect()
-
-    # if not mongo_inserter.is_connect:
-    #     exit(1)
-
     mongo_inserter.start()
 
     # start traceroute monitor thread
     monitor = trace_monitor.TraceMonitor(**monitor_parameters)
     monitor.start()
 
+    # start FTP uploader worker thread
     ftp_uploader = threading.Thread(target=bgp_worker, daemon=True)
     ftp_uploader.start()
 
-    print("run server")
+    # run dashboard application
     start_updater_thread()
-    app.run(host='192.0.0.3', debug=True, threaded=True)
-
-
-if __name__ == '__main__':
-    run_app()
+    app.run(host='192.0.0.3', port=5000, debug=True, threaded=True)

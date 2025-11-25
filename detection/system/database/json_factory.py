@@ -6,11 +6,11 @@ sensors_dict = {'192.168.1.246': 1,
 
 def jsonify_trace_list(sensor_ip, destination_ip, hops):
 
-    print(f"hops: {hops}")
+    #print(f"hops: {hops}")
     json_hops = []
 
     for hop in hops:
-        print(f"hop: {hop}")
+        #print(f"hop: {hop}")
         hop_num = hop[0]
         delays = hop[1]
         hop_ip = hop[2]

@@ -1,6 +1,5 @@
-from detection.system.analysis.asn_path_graphic_analysis import asn_path_graphic_analysis
+from detection.system.analysis.asn_path_graphic_analysis import asn_path_graphic_analysis2
 from detection.detection_tools.as_relationships import get_as_relationships
-from pprint import pprint
 import networkx as nx
 import matplotlib
 
@@ -54,21 +53,18 @@ def assign_level(nodes, as_relationships):
 
 def get_aspath_chart_fig(title, nodes, edges, as_relationships):
     # build graph
-    #print(f"nodes: {nodes}")
     G = nx.DiGraph()
     G.add_nodes_from(nodes)
     G.add_edges_from(edges)
 
     levels = assign_level(nodes, as_relationships)
 
-    pprint(levels)
-
     # Build positions: spread on x, y = level
     pos = {}
     for i, n in enumerate(nodes):
         pos[n] = (i, levels[n])
 
-    edge_colors, edge_styles, edge_labels, error_nodes = asn_path_graphic_analysis(G, as_relationships)
+    edge_colors, edge_styles, edge_labels, error_nodes = asn_path_graphic_analysis2(G, as_relationships)
 
     node_colors = []
     for n in G.nodes():
@@ -90,7 +86,6 @@ def get_aspath_chart_fig(title, nodes, edges, as_relationships):
         nx.draw_networkx_edge_labels(G, pos, edge_labels=edge_labels, font_color='black')
 
         plt.axis('off')
-        #plt.tight_layout()
         plt.title(title)
 
         return fig
@@ -101,21 +96,27 @@ def get_aspath_chart_fig(title, nodes, edges, as_relationships):
 
 if __name__ == '__main__':
     from pprint import pprint
+    import matplotlib.pyplot as plt
+    import pickle
 
     # valid route
-    # nodes = [100, 200, 300, 400]
+    nodes = [100, 200, 300, 400]
 
     # invalid (valley free) route
-    nodes = [100, 200, 666, 300, 400]
+    #nodes = [100, 200, 666, 300, 400]
 
     edges = make_edges(nodes)
     as_relationships = get_as_relationships()
 
-    # pprint(as_relationships)
+    # #pprint(as_relationships)
 
     fig = get_aspath_chart_fig("No Data Plane to Present",nodes, edges, as_relationships)
     filename = f"test_valley_free_chart.png"
     # filepath = os.path.join(STATIC_DIR, filename)
+
     fig.tight_layout()
-    plt.savefig(filename, format="png", dpi=120)
+    #fig.savefig("test_figure.pickle", format="pickle")
+    with open('test_figure.pickle', 'wb') as f:
+        pickle.dump(fig, f)
+    #plt.savefig(filename, format="png", dpi=120)
     plt.close(fig)
