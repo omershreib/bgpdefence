@@ -13,7 +13,7 @@ import os
 
 # mongodb config
 MONGO_CLIENT_URL = CONFIG['system']['mongoDB']['client_url']
-MONGO_DATABASE = CONFIG['system']['mongoDB']['database']
+MONGO_DATABASE = CONFIG['system']['mongoDB']['prod_database']
 MONGO_COLLECTION = CONFIG['system']['mongoDB']['collection']
 
 # mongoDB connection setup

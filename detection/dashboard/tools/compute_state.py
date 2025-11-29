@@ -11,6 +11,11 @@ DELAY_POINT_LIMIT = CONFIG['dashboard']['delay_points_limit']
 DELAY_POINT_THRESHOLD = CONFIG['dashboard']['delay_points_threshold']
 
 
+def get_sensor_id():
+    sensor_ip = CONFIG['system']['monitor_setup']['sensor_ip']
+    return CONFIG['sensors_dict'][sensor_ip]
+
+
 def save_exception_wrapper(*args, **kwargs):
     # for some reason that I did not have enough time to investigate, I sometimes receive an error when attempting
     # to save figures. the quickest and deaerates solution is to ignore these errors ... /: (when refreshing the page
@@ -43,7 +48,7 @@ def compute_state(collection, prefixes, traceroute_id):
         "next_id": next traceroute Object id (if not exist return current traceroute id)
         "ts": time parameter for image caching
     """
-    curr_data_plane = collection.find_one({"sensor_id": 2, "_id": ObjectId(f"{traceroute_id}")})
+    curr_data_plane = collection.find_one({"sensor_id": get_sensor_id(), "_id": ObjectId(f"{traceroute_id}")})
     if not curr_data_plane:
         return None
 
@@ -51,17 +56,17 @@ def compute_state(collection, prefixes, traceroute_id):
     trace_hops = curr_data_plane["hops"]
 
     prev_data_plane = collection.find_one(
-        {"destination_ip": destination_ip, "sensor_id": 2, "_id": {"$lt": ObjectId(traceroute_id)}},
+        {"destination_ip": destination_ip, "sensor_id": get_sensor_id(), "_id": {"$lt": ObjectId(traceroute_id)}},
         sort=[("_id", -1)]
     )
     next_data_plane = collection.find_one(
-        {"destination_ip": destination_ip, "sensor_id": 2, "_id": {"$gt": ObjectId(traceroute_id)}},
+        {"destination_ip": destination_ip, "sensor_id": get_sensor_id(), "_id": {"$gt": ObjectId(traceroute_id)}},
         sort=[("_id", 1)]
     )
 
     pull_bgp_table('latest_bgp_table.txt')
 
-    delay_chart_fig = get_delay_chart(collection, limit=DELAY_POINT_LIMIT, threshold=DELAY_POINT_THRESHOLD)
+    delay_chart_fig = get_delay_chart(collection)
     delay_chart_url = save_exception_wrapper(delay_chart_fig, prefix="delay_chart")
 
     control_plane_chart_fig, _ = get_control_plane_chart()

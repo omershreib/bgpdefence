@@ -8,9 +8,15 @@ import time
 trace_queue = Queue()
 
 
-def make_mongo_inserter_parameters(items: dict):
+def make_mongo_inserter_parameters(items: dict, mode='prod'):
     client_url: str = items['client_url']
-    database: str = items['database']
+
+    if mode == 'prod':
+        database: str = items['prod_database']
+
+    if mode == 'test':
+        database: str = items['test_database']
+
     collection: str = items['collection']
     frequency: int = items['trace_queue_check_frequency']
 

@@ -1,10 +1,17 @@
-from detection.system.charts.get_data_plane_delay import get_data_plane_delay
+from config import CONFIG
 import matplotlib
 
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
 
+
+def get_data_plane_delay(data_plane):
+    for hop in data_plane['hops'][::-1]:
+        if hop['responded']:
+            return min([delay for delay in hop['delays'] if delay is not None])
+
+    return 0
 
 def set_delay_scatter():
     fig = Figure()
@@ -18,23 +25,20 @@ def set_delay_scatter():
     return fig, ax
 
 
-def get_current_delay(collection):
-    mongo_filter = {
-        'sensor_id': 2
-    }
-    sort = list({'timestamp': -1}.items())
-    latest_traceroute = collection.find_one(
-        filter=mongo_filter,
-        sort=sort
-    )
+def get_delay_chart(collection):
+    """
+    Get Delay Chart
 
-    latest_delay = get_data_plane_delay(latest_traceroute)
-    timestamp = latest_traceroute['timestamp'].strftime("%H:%M:%S")
+    Note:
+    ----
+    the number of last points (limit) and delay threshold value can be configured in the config file
 
-    return latest_delay, timestamp
+    :param collection: mongoDB MongoClient object (should equal to db['traceroutes'])
+    :return: matplotlib chart figure
+    """
+    limit = CONFIG['dashboard']['delay_points_limit']
+    threshold = CONFIG['dashboard']['delay_points_threshold']
 
-
-def get_delay_chart(collection, limit=25, threshold=150):
     delay_data = []
 
     mongo_filter = {
@@ -68,21 +72,3 @@ def get_delay_chart(collection, limit=25, threshold=150):
 
     plt.tight_layout()
     return fig
-
-
-if __name__ == '__main__':
-    from pymongo import MongoClient
-
-    client = MongoClient("mongodb://localhost:27017/")
-    db = client["network_monitoring"]
-    collection = db['traceroutes']
-
-    fig = get_delay_chart(collection)
-
-    delay_chart_fig = get_delay_chart(collection)
-    filename = f"test_delay.png"
-
-    fig.tight_layout()
-    plt.savefig(filename, format="png", dpi=120)
-    plt.close(fig)
-    plt.clf()

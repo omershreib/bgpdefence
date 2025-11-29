@@ -6,6 +6,15 @@ import pandas as pd
 
 
 def get_data_plane_chart(trace_hops, prefixes, sensor_asn=100):
+    """
+    Get Data Plane Chart
+
+    :param trace_hops: list of traceroute hops
+    :param prefixes:
+    :param sensor_asn: in the lab is always 100
+    (when running this code in a real environment this number need to change)
+    :return: a matplotlib chart figure and a hop-to-asn mapping dictionary
+    """
     hop_to_asn_dict = {}
     raw_as_path = [sensor_asn]
     fixed_as_path = []
@@ -14,12 +23,6 @@ def get_data_plane_chart(trace_hops, prefixes, sensor_asn=100):
     for hop in trace_hops:
         if hop['responded']:
             hop_ip = hop['hop_ip']
-
-            # response = prefixes.query('network == @hop_ip')
-            # print(hop_ip)
-            # response = prefixes[prefixes["network_obj"].apply(lambda net: hop_ip in net)]
-            # print(response)
-
             asn = prefix2as.ip_to_asn(hop_ip, prefixes)
 
             if not asn:
@@ -39,47 +42,3 @@ def get_data_plane_chart(trace_hops, prefixes, sensor_asn=100):
 
     fig = get_as_path_chart_fig("Data Plane AS-Path", fixed_as_path, edges, AS_RELATIONSHIPS)
     return fig, hop_to_asn_dict
-
-
-def cplane_test():
-    prefix2as_csv = r"D:\Documents\open university\netSeminar\source\detection\utilities\prefix2as.csv"
-    prefixes = pd.read_csv(prefix2as_csv)
-
-    trace_hops = [{'hop_num': 1, 'hop_ip': '192.0.0.254', 'delays': [3.0, 10.0, 10.0], 'responded': True},
-                  {'hop_num': 2, 'hop_ip': '23.9.1.1', 'delays': [17.0, 20.0, 20.0], 'responded': True},
-                  {'hop_num': 3, 'hop_ip': '10.0.0.1', 'delays': [42.0, 41.0, 41.0], 'responded': True},
-                  {'hop_num': 4, 'hop_ip': '10.0.0.9', 'delays': [49.0, 42.0, 51.0], 'responded': True},
-                  {'hop_num': 5, 'hop_ip': '10.0.0.18', 'delays': [60.0, 61.0, 72.0], 'responded': True},
-                  {'hop_num': 6, 'hop_ip': '198.18.1.13', 'delays': [74.0, 72.0, 72.0], 'responded': True}]
-
-    fig, hop_to_asn_dict = get_data_plane_chart(trace_hops, prefixes)
-
-
-if __name__ == '__main__':
-    import matplotlib
-
-    matplotlib.use('Agg')
-    import matplotlib.pyplot as plt
-
-    # cplane_test()
-    # mongodb config
-    client = MongoClient("mongodb://localhost:27017/")
-    db = client["network_monitoring"]
-    collection = db["traceroutes"]
-    traceroute_id = ObjectId("69219177988e64c0570e10e8")
-
-    prefix2as_csv = r"D:\Documents\open university\netSeminar\source\detection\utilities\prefix2as.csv"
-    prefixes = pd.read_csv(prefix2as_csv)
-
-    print(prefixes)
-
-    data_plane = collection.find_one({"sensor_id": 2, "_id": ObjectId(f"6922e05ecb0c1b4bc7bb9dfe")})
-    destination_ip = data_plane['destination_ip']
-    trace_hops = data_plane['hops']
-    print(f"destination_ip: {destination_ip}")
-    print()
-
-    fig, hop_to_asn_dict = get_data_plane_chart(trace_hops, prefixes)
-    plt.title = "No Data Plane to Present..."
-    fig.tight_layout()
-    plt.savefig('default_data_plane_chart.png')
