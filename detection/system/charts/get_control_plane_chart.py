@@ -5,10 +5,15 @@ from ipaddress import IPv4Address
 import pandas as pd
 
 
-def get_control_plane_chart(sensor_asn=100):
+def get_control_plane_chart(sensor_asn=100, mode='prod'):
     raw_as_path = [sensor_asn]
 
-    bgp_file = CONFIG['utilities']['bgp_table']
+    if mode == 'test':
+        bgp_file = CONFIG['utilities']['test_bgp_table']
+
+    if mode == 'prod':
+        bgp_file = CONFIG['utilities']['bgp_table']
+
     bgp_routes = parse_bgp.bgp_table_to_dict(bgp_file)
 
     df = pd.DataFrame(bgp_routes)

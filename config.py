@@ -1,3 +1,10 @@
+import os
+
+__path__ = os.getcwd()
+
+if 'tests' in __path__:
+    __path__ = __path__.removesuffix(r'\tests')
+
 CONFIG = {}
 
 # dashboard configuration
@@ -35,12 +42,12 @@ CONFIG['system']['flask_app'] = {
     'updater_loop_sleep_time': 60,
 }
 
-# prefix2as configuration
+# utilities configuration
 CONFIG['utilities'] = {
-    'prefix2as': r'D:\Documents\open university\netSeminar\source\detection\utilities\prefix2as\prefix2as.csv',
-    'bgp_table': r'D:\Documents\open university\netSeminar\source\detection\utilities\bgp_table'
-                 r'\latest_bgp_table.txt'
-
+    'prefix2as': rf'{__path__}\detection\utilities\prefix2as\prefix2as.csv',
+    'bgp_table': rf'{__path__}\detection\utilities\bgp_table'
+                 r'\latest_bgp_table.txt',
+    'test_bgp_table': rf'{__path__}\tests\test_files\test_bgp_table.txt'
 }
 
 # FTP upload/download process configuration
@@ -50,7 +57,7 @@ CONFIG['ftp_process'] = {
     'user': 'ftpuser',
     'password': '051295',
     'filename': 'bgp_table.txt',
-    'filepath': r'D:\Documents\open university\netSeminar\source\detection',
+    'filepath': rf'{__path__}\detection',
 
     'local_isp': {'router_ip': '203.0.113.254',
                   'user': 'local_isp',
@@ -66,3 +73,7 @@ CONFIG['sensors_dict'] = {
     '192.168.1.246': 1,
     '192.0.0.3': 2
 }
+
+
+
+

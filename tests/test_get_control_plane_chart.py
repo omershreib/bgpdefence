@@ -19,7 +19,7 @@ class TestGetControlPlaneChart(unittest.TestCase):
 
     def test_get_control_plane_chart(self):
         self.excepted_img = mpimg.imread(self.test_chart)
-        actual_fig, actual_raw_as_path = get_control_plane_chart(sensor_asn=100)
+        actual_fig, actual_raw_as_path = get_control_plane_chart(sensor_asn=100, mode='test')
 
         actual_fig.tight_layout()
         plt.savefig(self.filename, format="png", dpi=120)
